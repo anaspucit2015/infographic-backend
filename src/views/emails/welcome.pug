@@ -1,0 +1,11 @@
+extends base
+
+block content
+  p Hi #{firstName},
+  p Welcome to Infographic Creator! We're excited to have you on board. 🎉
+  p To get started, please verify your email address by clicking the button below:
+  p(style='text-align: center;')
+    a.button(href=url) Verify Email
+  p If the button doesn't work, you can also copy and paste this link into your browser:
+  p(style='word-break: break-all;') #{url}
+  p If you didn't create an account with us, please ignore this email.
