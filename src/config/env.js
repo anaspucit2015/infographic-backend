@@ -16,7 +16,7 @@ const config = {
   env,
   isProduction,
   port: process.env.PORT || 3001,
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:8080',
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRE || '30d',

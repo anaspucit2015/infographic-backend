@@ -29,20 +29,27 @@ const router = express.Router();
  *               - name
  *               - email
  *               - password
- *               - passwordConfirm
  *             properties:
  *               name:
  *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
  *               email:
  *                 type: string
  *                 format: email
+ *               phone:
+ *                 type: string
+ *                 pattern: '^[\\+]?[1-9][\\d]{0,15}$'
+ *                 description: Optional phone number
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other, prefer-not-to-say]
+ *                 default: prefer-not-to-say
+ *                 description: Optional gender selection
  *               password:
  *                 type: string
  *                 format: password
- *                 minLength: 8
- *               passwordConfirm:
- *                 type: string
- *                 format: password
+ *                 minLength: 6
  *     responses:
  *       201:
  *         description: User registered successfully

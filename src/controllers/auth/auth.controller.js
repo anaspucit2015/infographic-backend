@@ -9,45 +9,33 @@ import { createSendToken, filterObj } from './auth.helper.js';
 // @access  Public
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, passwordConfirm } = req.body;
+    const { name, email, phone, gender, password } = req.body;
 
     // 1) Check if user already exists
+    console.log({email});
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return next(new ApiError(400, 'Email already in use'));
     }
 
-    // 2) Create new user
+    // 2) Create new user (email verification disabled)
     const newUser = await User.create({
       name,
       email,
+      phone,
+      gender,
       password,
-      passwordConfirm,
+      emailVerified: true, // Auto-verify email for now
     });
 
-    // 3) Generate email verification token
-    const verificationToken = newUser.createEmailVerificationToken();
-    await newUser.save({ validateBeforeSave: false });
-
-    try {
-      // 4) Send verification email (only if email is configured)
-      if (process.env.EMAIL_HOST && process.env.EMAIL_USERNAME && process.env.EMAIL_PASSWORD) {
-        const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/verify-email/${verificationToken}`;
-        await new Email(newUser, verificationUrl).sendWelcome();
-      } else {
-        console.log('Email configuration not found, skipping email verification');
-      }
-
-      // 5) Send response with token
-      createSendToken(newUser, 201, req, res);
-    } catch (err) {
-      // If email sending fails, just log the error but don't delete the user
-      console.error('Email sending failed:', err.message);
-      
-      // Still send the response with token
-      createSendToken(newUser, 201, req, res);
-    }
+    // 3) Send response with token
+    createSendToken(newUser, 201, req, res);
   } catch (error) {
+    console.log({error});
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return next(new ApiError(400, `Validation failed: ${validationErrors.join(', ')}`));
+    }
     next(error);
   }
 };

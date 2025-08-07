@@ -16,23 +16,19 @@ export const registerSchema = [
     .withMessage('Please provide a valid email')
     .normalizeEmail(),
   
+  body('phone')
+    .optional(),
+  
+  body('gender')
+    .optional()
+    .isIn(['male', 'female', 'other', 'prefer-not-to-say'])
+    .withMessage('Gender must be one of: male, female, other, prefer-not-to-say'),
+  
   body('password')
     .notEmpty()
     .withMessage('Password is required')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
-    .matches(/[a-z]/)
-    .withMessage('Password must contain at least one lowercase letter')
-    .matches(/[A-Z]/)
-    .withMessage('Password must contain at least one uppercase letter')
-    .matches(/\d/)
-    .withMessage('Password must contain at least one number'),
-  
-  body('passwordConfirm')
-    .notEmpty()
-    .withMessage('Please confirm your password')
-    .custom((value, { req }) => value === req.body.password)
-    .withMessage('Passwords do not match')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long')
 ];
 
 export const loginSchema = [

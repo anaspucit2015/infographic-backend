@@ -80,14 +80,13 @@ app.use(
   })
 );
 
-// Enable CORS
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+// Enable CORS - Allow all origins for development
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: false, // No credentials needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+}));
 
 // Compression
 app.use(compression());
@@ -103,6 +102,16 @@ import('./src/config/passport.js').then(() => {
 // ========================
 // 3) ROUTES
 // ========================
+
+// CORS test endpoint
+app.get('/api/cors-test', (req, res) => {
+  res.json({ 
+    message: 'CORS is working!', 
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/api/v1', routes);
 
 // ========================
