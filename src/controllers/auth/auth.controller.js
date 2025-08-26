@@ -9,29 +9,21 @@ import { createSendToken, filterObj } from './auth.helper.js';
 // @access  Public
 export const register = async (req, res, next) => {
   try {
-    const { name, email, phone, gender, password } = req.body;
+    const { name, email, phone, password } = req.body;
 
-    // 1) Check if user already exists
-    console.log({email});
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return next(new ApiError(400, 'Email already in use'));
     }
-
-    // 2) Create new user (email verification disabled)
     const newUser = await User.create({
       name,
       email,
       phone,
-      gender,
       password,
-      emailVerified: true, // Auto-verify email for now
+      emailVerified: true,
     });
-
-    // 3) Send response with token
     createSendToken(newUser, 201, req, res);
   } catch (error) {
-    console.log({error});
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(err => err.message);
       return next(new ApiError(400, `Validation failed: ${validationErrors.join(', ')}`));
