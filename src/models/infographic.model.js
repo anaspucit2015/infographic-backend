@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const infographicSchema = new mongoose.Schema(
   {
@@ -18,72 +18,36 @@ const infographicSchema = new mongoose.Schema(
       trim: true,
       maxlength: [500, 'Description cannot be more than 500 characters'],
     },
-    content: {
-      type: mongoose.Schema.Types.Mixed,
+    designState: {
+      type: String,
       required: [true, 'Please provide content for the infographic'],
+      validate: {
+        validator: function (value) {
+          if (typeof value !== 'string') {
+            return false;
+          }
+          try {
+            const parsed = JSON.parse(value);
+            return typeof parsed === 'object' && parsed !== null && Object.keys(parsed).length > 0;
+          } catch (error) {
+            return false;
+          }
+        },
+        message: 'Please provide a valid non-empty design state.',
+      },
     },
-    thumbnail: {
-      type: String,
-      default: 'default-infographic.jpg',
-    },
-    isPublic: {
-      type: Boolean,
-      default: false,
-    },
-    tags: [{
-      type: String,
-      trim: true,
-      lowercase: true,
-    }],
-    category: {
-      type: String,
-      enum: ['business', 'education', 'health', 'technology', 'marketing', 'other'],
-      default: 'other',
-    },
-    views: {
+    exportCount: {
       type: Number,
       default: 0,
-    },
-    likes: [{
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-    }],
-    downloads: {
-      type: Number,
-      default: 0,
-    },
-    template: {
-      type: String,
-      default: 'default',
-    },
-    style: {
-      type: mongoose.Schema.Types.Mixed,
-      default: {},
     },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
 // Indexes
 infographicSchema.index({ user: 1 });
-infographicSchema.index({ title: 'text', description: 'text', tags: 'text' });
-infographicSchema.index({ isPublic: 1, createdAt: -1 });
-
-// Virtual for comments
-infographicSchema.virtual('comments', {
-  ref: 'Comment',
-  foreignField: 'infographic',
-  localField: '_id',
-});
-
-// Virtual for likes count
-infographicSchema.virtual('likesCount').get(function () {
-  return this.likes?.length || 0;
-});
 
 // Populate user data when querying
 infographicSchema.pre(/^find/, function (next) {
@@ -96,4 +60,4 @@ infographicSchema.pre(/^find/, function (next) {
 
 const Infographic = mongoose.model('Infographic', infographicSchema);
 
-module.exports = Infographic;
+export default Infographic;

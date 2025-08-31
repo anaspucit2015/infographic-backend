@@ -1,6 +1,6 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
+import cloudinary from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -21,12 +21,13 @@ const storage = new CloudinaryStorage({
 
 const parser = multer({ storage });
 
-module.exports = {
-  cloudinary,
-  upload: parser.single('image'),
-  uploadFields: parser.fields([
-    { name: 'image', maxCount: 1 },
-    { name: 'thumbnail', maxCount: 1 },
-  ]),
-  uploadMultiple: parser.array('images', 10),
-};
+export const upload = parser.single('image');
+
+export const uploadFields = parser.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 },
+]);
+
+export const uploadMultiple = parser.array('images', 10);
+
+export { cloudinary };

@@ -1,8 +1,17 @@
-const express = require('express');
+import express from 'express';
+import {
+  createInfographic,
+  getAllInfographics,
+  getInfographic,
+  updateInfographic,
+  deleteInfographic,
+  getUserInfographics,
+  checkExportLimit,
+  exportInfographic,
+} from '../controllers/infographic.controller.js';
+import { protect, restrictTo } from '../middleware/auth.middleware.js';
+
 const router = express.Router();
-const infographicController = require('../controllers/infographic.controller');
-const authController = require('../controllers/auth/auth.controller');
-const { upload } = require('../../config/cloudinary');
 
 /**
  * @swagger
@@ -40,7 +49,7 @@ router
    *       200:
    *         description: List of infographics
    */
-  .get(infographicController.getAllInfographics)
+  .get(getAllInfographics)
   /**
    * @swagger
    * /api/v1/infographics:
@@ -79,9 +88,9 @@ router
    *         description: Not authorized
    */
   .post(
-    authController.protect,
-    authController.restrictTo('user', 'admin'),
-    infographicController.createInfographic
+    protect,
+    restrictTo('user', 'admin'),
+    createInfographic
   );
 
 router
@@ -104,7 +113,7 @@ router
    *       404:
    *         description: Infographic not found
    */
-  .get(infographicController.getInfographic)
+  .get(getInfographic)
   /**
    * @swagger
    * /api/v1/infographics/{id}:
@@ -140,9 +149,9 @@ router
    *         description: Not authorized to update this infographic
    */
   .patch(
-    authController.protect,
-    authController.restrictTo('user', 'admin'),
-    infographicController.updateInfographic
+    protect,
+    restrictTo('user', 'admin'),
+    updateInfographic
   )
   /**
    * @swagger
@@ -165,9 +174,9 @@ router
    *         description: Not authorized to delete this infographic
    */
   .delete(
-    authController.protect,
-    authController.restrictTo('user', 'admin'),
-    infographicController.deleteInfographic
+    protect,
+    restrictTo('user', 'admin'),
+    deleteInfographic
   );
 
 /**
@@ -186,6 +195,9 @@ router
  *       200:
  *         description: List of user's infographics
  */
-router.get('/user/:userId', infographicController.getUserInfographics);
+router.get('/user/:userId', getUserInfographics);
 
-module.exports = router;
+router.get('/export-check/:id', protect, checkExportLimit);
+router.post('/export/:id', protect, exportInfographic);
+
+export default router;
